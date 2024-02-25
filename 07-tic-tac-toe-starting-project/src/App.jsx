@@ -21,6 +21,10 @@ function deriveCurrentPlayer(turns) {
 }
 function App() {
   const [gameTurns, setGameTurns] = useState([]);
+  const [playerNames, setPlayerNames] = useState({
+    X: "Player 1",
+    O: "Player 2",
+  });
 
   const currentPlayer = deriveCurrentPlayer(gameTurns);
   const gameBoard = [...initialGameBoard.map((inner) => [...inner])];
@@ -46,7 +50,7 @@ function App() {
       firstSquareSymbol === secondSquareSymbol &&
       firstSquareSymbol === thirdSquareSymbol
     ) {
-      winner = firstSquareSymbol;
+      winner = playerNames[firstSquareSymbol];
     }
   }
 
@@ -61,6 +65,14 @@ function App() {
       ];
     });
   }
+  function handleChangeName(symbol, name) {
+    setPlayerNames((prevNames) => {
+      return {
+        ...prevNames,
+        [symbol]: name,
+      };
+    });
+  }
 
   function handleRestart() {
     setGameTurns([]);
@@ -70,8 +82,18 @@ function App() {
       <h1>React Tic-Tac-Toe</h1>
       <main id="game-container">
         <ol id="players" className="highlight-player">
-          <Player name="player1" symbol="X" isActive={currentPlayer === "X"} />
-          <Player name="player2" symbol="0" isActive={currentPlayer === "O"} />
+          <Player
+            name="player1"
+            symbol="X"
+            isActive={currentPlayer === "X"}
+            onChangeName={handleChangeName}
+          />
+          <Player
+            name="player2"
+            symbol="0"
+            isActive={currentPlayer === "O"}
+            onChangeName={handleChangeName}
+          />
         </ol>
         {(hasDraw || winner) && (
           <GameOver winner={winner} onRestart={handleRestart} />
