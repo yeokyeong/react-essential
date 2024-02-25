@@ -5,11 +5,16 @@ import Log from "./components/Log";
 import GameOver from "./components/GameOver";
 import { WINNING_COMBINATIONS } from "./winning-combinations";
 
-const initialGameBoard = [
+const INITIAL_GAME_BOARD = [
   [null, null, null],
   [null, null, null],
   [null, null, null],
 ];
+
+const PLAYERS = {
+  X: "Player 1",
+  O: "Player 2",
+};
 
 function deriveCurrentPlayer(turns) {
   let currentPlayer = "X";
@@ -19,23 +24,8 @@ function deriveCurrentPlayer(turns) {
 
   return currentPlayer;
 }
-function App() {
-  const [gameTurns, setGameTurns] = useState([]);
-  const [playerNames, setPlayerNames] = useState({
-    X: "Player 1",
-    O: "Player 2",
-  });
 
-  const currentPlayer = deriveCurrentPlayer(gameTurns);
-  const gameBoard = [...initialGameBoard.map((inner) => [...inner])];
-
-  for (const turns of gameTurns) {
-    // it will excute whenever App component render
-    const { square, player } = turns;
-    const { row, col } = square;
-    gameBoard[row][col] = player;
-  }
-
+function deriveWinner(gameBoard, playerNames) {
   let winner;
   for (const combination of WINNING_COMBINATIONS) {
     // it will excute whenever App component render
@@ -53,6 +43,29 @@ function App() {
       winner = playerNames[firstSquareSymbol];
     }
   }
+  return winner;
+}
+
+function derviveGameBoard(gameTurns) {
+  const gameBoard = [...INITIAL_GAME_BOARD.map((inner) => [...inner])];
+
+  for (const turns of gameTurns) {
+    // it will excute whenever App component render
+    const { square, player } = turns;
+    const { row, col } = square;
+    gameBoard[row][col] = player;
+  }
+  return gameBoard;
+}
+function App() {
+  const [gameTurns, setGameTurns] = useState([]);
+  const [playerNames, setPlayerNames] = useState(PLAYERS);
+
+  const currentPlayer = deriveCurrentPlayer(gameTurns);
+
+  const gameBoard = derviveGameBoard(gameTurns);
+
+  const winner = deriveWinner(gameBoard, playerNames);
 
   const hasDraw = gameTurns.length === 9 && !winner;
 
@@ -83,14 +96,14 @@ function App() {
       <main id="game-container">
         <ol id="players" className="highlight-player">
           <Player
-            name="player1"
+            name={PLAYERS.X}
             symbol="X"
             isActive={currentPlayer === "X"}
             onChangeName={handleChangeName}
           />
           <Player
-            name="player2"
-            symbol="0"
+            name={PLAYERS.O}
+            symbol="O"
             isActive={currentPlayer === "O"}
             onChangeName={handleChangeName}
           />
